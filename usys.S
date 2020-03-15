@@ -30,3 +30,22 @@ SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
 SYSCALL(halt)
+SYSCALL(date)
+
+//PROJECT 2
+SYSCALL(getuid)
+SYSCALL(getgid)
+SYSCALL(getppid)
+SYSCALL(setuid)
+SYSCALL(setgid)
+SYSCALL(getprocs)
+
+//Project 4
+SYSCALL(setpriority)
+SYSCALL(getpriority)
+
+//Project 5
+SYSCALL(chmod)
+SYSCALL(chown)
+SYSCALL(chgrp)
+

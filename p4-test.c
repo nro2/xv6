@@ -1,4 +1,4 @@
-#ifdef CS333_P3P4
+#ifdef CS333_P4
 // Credit to Jacob Collins <jmc27@pdx.edu> who developed this test
 // program and gave me permission to use it
 
@@ -52,7 +52,7 @@ main(int argc, char* argv[])
   int select, done;
   char buf[5];
   //void (*test[])() = {test1, test2, test3, test4, test5, test6};
-
+  printf(1, "Right inside main\n");
   printf(1, "p4test starting with: MAXPRIO = %d, DEFAULT_BUDGET = %d, TICKS_TO_PROMOTE = %d\n\n",
       plevels, budget, promo);
 

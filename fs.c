@@ -205,6 +205,11 @@ ialloc(uint dev, short type)
     if(dip->type == 0){  // a free inode
       memset(dip, 0, sizeof(*dip));
       dip->type = type;
+#ifdef CS333_P5
+      dip->uid = DEF_UID;
+      dip->gid = DEF_GID;
+      dip->mode.asInt = DEF_MODE;
+#endif      
       log_write(bp);   // mark it allocated on the disk
       brelse(bp);
       return iget(dev, inum);
@@ -231,6 +236,11 @@ iupdate(struct inode *ip)
   dip->minor = ip->minor;
   dip->nlink = ip->nlink;
   dip->size = ip->size;
+#ifdef CS333_P5
+  dip->uid = ip->uid;
+  dip->gid = ip->gid;
+  dip->mode.asInt = ip->mode.asInt;
+#endif
   memmove(dip->addrs, ip->addrs, sizeof(ip->addrs));
   log_write(bp);
   brelse(bp);
@@ -268,7 +278,6 @@ iget(uint dev, uint inum)
   ip->ref = 1;
   ip->valid = 0;
   release(&icache.lock);
-
   return ip;
 }
 
@@ -304,6 +313,14 @@ ilock(struct inode *ip)
     ip->minor = dip->minor;
     ip->nlink = dip->nlink;
     ip->size = dip->size;
+#ifdef CS333_P5
+  //  ip->gid = DEF_GID;
+  //  ip->uid = DEF_UID;
+  //  ip->mode.asInt = DEF_MODE;
+      ip->gid = dip->gid;
+      ip->uid = dip->uid;
+      ip->mode.asInt = dip->mode.asInt;
+#endif
     memmove(ip->addrs, dip->addrs, sizeof(ip->addrs));
     brelse(bp);
     ip->valid = 1;
@@ -445,6 +462,11 @@ stati(struct inode *ip, struct stat *st)
   st->type = ip->type;
   st->nlink = ip->nlink;
   st->size = ip->size;
+#ifdef CS333_P5
+  st->gid = ip->gid;
+  st->uid = ip->uid;
+  st->mode.asInt = ip->mode.asInt;
+#endif
 }
 
 //PAGEBREAK!
@@ -669,4 +691,65 @@ nameiparent(char *path, char *name)
 {
   return namex(path, 1, name);
 }
+#ifdef CS333_P5
 
+int
+chmod(char *pathname, int mode)
+{
+  struct inode *ip;
+  begin_op();
+  if( (ip = namei(pathname)) == 0){
+    end_op();
+    return -1;
+  }
+  ilock(ip);
+  ip->mode.asInt = mode;
+  iupdate(ip);
+  iunlockput(ip);
+
+  end_op();
+  return 0;
+}
+
+
+int
+chown(char *pathname, int owner)
+{
+  struct inode *ip;
+  begin_op();
+  if((ip = namei(pathname)) == 0) {
+    end_op();
+    return -1;
+  }
+
+  ilock(ip);
+  ip->uid = owner;
+  iupdate(ip);
+  iunlockput(ip);
+
+  end_op();
+  return 0;
+}
+
+
+int
+chgrp(char *pathname, int group)
+{
+  struct inode *ip;
+  begin_op();
+  if((ip = namei(pathname)) == 0) {
+    end_op();
+    return -1;
+  }
+
+  ilock(ip);
+  ip->gid = group;
+  iupdate(ip);
+  iunlockput(ip);
+
+  end_op();
+  return 0;
+}
+
+
+#endif

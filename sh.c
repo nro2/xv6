@@ -158,6 +158,9 @@ int
 setbuiltin(char *p)
 {
   int i;
+/*  #ifdef CS333_P4
+  int j;
+  #endif*/
   int rc;
 
   p += strlen("_set");
@@ -178,6 +181,18 @@ setbuiltin(char *p)
     if (rc == 0)
       return 0;
   }
+/*  #ifdef CS333_P4
+  if (strncmp("priority", p, 8) == 0) {
+    p += strlen("priority");
+    while (strncmp(p, " ", 1) == 0) p++; // chomp spaces
+    i = atoi(p);
+    while (strncmp(p, " ", 1) == 0) p++; // chomp spaces
+    j = atoi(p);
+    rc = setpriority(i, j);
+    if (rc == 0)
+      return 0;
+  #endif
+  }*/
   printf(2, "Invalid _set parameter\n");
   return -1;
 }

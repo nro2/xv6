@@ -2,6 +2,7 @@
 #include "stat.h"
 #include "user.h"
 #include "fs.h"
+#include "print_mode.c"
 
 
 char*
@@ -41,7 +42,40 @@ ls(char *path)
     close(fd);
     return;
   }
+#ifdef CS333_P5
+  printf(1, "mode\t\tname\t\tuid\tgid\tinode\tsize\n");
+  switch(st.type){
+  case T_FILE:
+  case T_DEV:
+    print_mode(&st);
+    printf(1, "\t%s\t%d\t%d\t%d\t%d\n", fmtname(path), st.uid, st.gid, st.ino, st.size);
+    break;
 
+  case T_DIR:
+    if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
+      printf(1, "ls: path too long\n");
+      break;
+    }
+    strcpy(buf, path);
+    p = buf+strlen(buf);
+    *p++ = '/';
+    while(read(fd, &de, sizeof(de)) == sizeof(de)){
+      if(de.inum == 0)
+        continue;
+      memmove(p, de.name, DIRSIZ);
+      p[DIRSIZ] = 0;
+      if(stat(buf, &st) < 0){
+        printf(1, "ls: cannot stat %s\n", buf);
+        continue;
+      }
+      print_mode(&st);
+      printf(1, "\t%s\t%d\t%d\t%d\t%d\n", fmtname(buf), st.uid, st.gid, st.ino, st.size);
+    }
+    break;
+  }
+  close(fd);
+}
+#else
   switch(st.type){
   case T_FILE:
   case T_DEV:
@@ -71,6 +105,7 @@ ls(char *path)
   }
   close(fd);
 }
+#endif
 
 int
 main(int argc, char *argv[])

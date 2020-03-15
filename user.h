@@ -1,5 +1,8 @@
 struct stat;
 struct rtcdate;
+#ifdef CS333_P2
+struct uproc;
+#endif
 
 // system calls
 int fork(void);
@@ -24,6 +27,31 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int halt(void);
+
+#ifdef CS333_P1
+int date(struct rtcdate*);
+#endif // CS333_P1
+
+
+#ifdef CS333_P2
+uint getuid(void);
+uint getgid(void);
+uint getppid(void);
+int setuid(uint);
+int setgid(uint);
+int getprocs(uint, struct uproc*);
+#endif
+
+#ifdef CS333_P4
+int setpriority(int, int);
+int getpriority(int);
+#endif
+
+#ifdef CS333_P5
+int chmod(char*, int);
+int chown(char*, int);
+int chgrp(char*, int);
+#endif
 
 // ulib.c
 int stat(char*, struct stat*);

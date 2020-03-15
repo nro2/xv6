@@ -257,7 +257,6 @@ static int
 testinvalidarray(void){
   struct uproc * table;
   int ret;
-
   table = malloc(sizeof(struct uproc));
   if (!table) {
     printf(2, "Error: malloc() call failed. %s at line %d\n", __FUNCTION__, __LINE__);
@@ -285,6 +284,7 @@ testgetprocs(){
     if(ret > 0){
       wait();
       exit();
+      
     }
     // Only return left is -1, which is no space left in ptable
     success  = testinvalidarray();

@@ -6,7 +6,7 @@
 #include "defs.h"
 #include "x86.h"
 #include "elf.h"
-
+#include "stat.h"
 
 int
 exec(char *path, char **argv)
@@ -24,7 +24,9 @@ exec(char *path, char **argv)
 
   if((ip = namei(path)) == 0){
     end_op();
+#ifndef PDX_XV6
     cprintf("exec: fail\n");
+#endif
     return -1;
   }
   ilock(ip);
@@ -38,6 +40,21 @@ exec(char *path, char **argv)
 
   if((pgdir = setupkvm()) == 0)
     goto bad;
+#ifdef CS333_P5
+  struct stat st;
+  stati(ip, &st);
+
+  if(st.uid == curproc->uid){
+    if(st.mode.flags.u_x != 1)
+      goto bad;
+  }
+  else if(st.gid == curproc->gid){
+    if(st.mode.flags.g_x != 1)
+      goto bad;
+  }
+  else if(st.mode.flags.o_x != 1)
+    goto bad;
+#endif
 
   // Load program into memory.
   sz = 0;
@@ -100,6 +117,10 @@ exec(char *path, char **argv)
   curproc->sz = sz;
   curproc->tf->eip = elf.entry;  // main
   curproc->tf->esp = sp;
+#ifdef CS333_P5
+  if(st.mode.flags.setuid == 1)
+    curproc->uid = st.uid;
+#endif
   switchuvm(curproc);
   freevm(oldpgdir);
   return 0;

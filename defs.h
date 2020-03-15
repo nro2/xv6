@@ -9,6 +9,9 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+#ifdef CS333_P2
+struct uproc;
+#endif
 
 // bio.c
 void            binit(void);
@@ -52,6 +55,9 @@ struct inode*   nameiparent(char*, char*);
 int             readi(struct inode*, char*, uint, uint);
 void            stati(struct inode*, struct stat*);
 int             writei(struct inode*, char*, uint, uint);
+int             chmod(char*, int);
+int             chown(char*, int);
+int             chgrp(char*, int);
 
 
 // ide.c
@@ -121,6 +127,19 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+#ifdef CS333_P2
+int             getprocs(uint, struct uproc*);
+#endif
+#ifdef CS333_P3
+void            readylist(void);
+void            freelist(void);
+void            sleeplist(void);
+void            zombielist(void);
+#endif
+#ifdef CS333_P4
+int             setpriority(int, int);
+int             getpriority(int);
+#endif
 
 // swtch.S
 void            swtch(struct context**, struct context*);

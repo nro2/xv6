@@ -13,6 +13,8 @@ struct cpu {
 extern struct cpu cpus[NCPU];
 extern int ncpu;
 
+
+
 //PAGEBREAK: 17
 // Saved registers for kernel context switches.
 // Don't need to save all the segment registers (%cs, etc),
@@ -36,6 +38,13 @@ enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
 struct proc {
+  #ifdef CS333_P3
+  struct proc *next;
+  #endif
+  #ifdef CS333_P4
+  uint priority;
+  int budget;
+  #endif  
   uint sz;                     // Size of process memory (bytes)
   pde_t* pgdir;                // Page table
   char *kstack;                // Bottom of kernel stack for this process
@@ -49,6 +58,13 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+  uint start_ticks;
+  #ifdef CS333_P2
+  uint uid;
+  uint gid;
+  uint cpu_ticks_total;
+  uint cpu_ticks_in;
+  #endif
 };
 
 // Process memory is laid out contiguously, low addresses first:
